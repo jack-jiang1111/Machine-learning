@@ -18,6 +18,14 @@ def readFiles(CSVfile):
 # TODO: numerial values
 TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("car/train.csv")
 TestAttributeData, TestLabelData, TestNumAttribute = readFiles("car/test.csv")
-tree = DecisionTree()
-tree.RunTree(TrainAttributeData, TrainLabelData, TrainNumAttribute, 0)
-tree.Predict(TestAttributeData, TestLabelData)
+
+tree = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 1)
+tree.RunTree()
+
+tree1 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 2)
+tree1.RunTree()
+
+tree2 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 3)
+tree2.RunTree()
+
+

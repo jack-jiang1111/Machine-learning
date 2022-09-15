@@ -5,10 +5,23 @@ from Split import *
 
 class DecisionTree:
     attribute_length = 0
-    root = Node(-1, "", "")
+    root = Node(-1, "", "",0)
     split = 0  # 0 for Entropy, 1 for ME, 2 for Gini
     PossibleAttribute = {}  # A dictionary, key is the attribute index, value is list of possible attribute
-    predictRate = 0 # accuracy for training set
+    max_depth = 100
+    TrainAttributeData = np.empty(1)
+    TrainLabelData= np.empty(1)
+    TestAttributeData= np.empty(1)
+    TestLabelData= np.empty(1)
+
+    def __init__(self,trainData,trainLabel,numAttribute,testData,testLabel,split=0,depth=100):
+        self.split = split
+        self.max_depth = depth
+        self.TrainAttributeData = trainData
+        self.TrainLabelData = trainLabel
+        self.attribute_length = numAttribute
+        self.TestAttributeData = testData
+        self.TestLabelData = testLabel
     def InitializePossibleAttribute(self, data):
         for i in range(self.attribute_length):
             self.PossibleAttribute[i] = []
@@ -47,6 +60,10 @@ class DecisionTree:
     # labels: list of labels corresponding to the attributeData
     # attributes: list of attribute still remaining
     def ConstructTree(self, currentNode, attributesData, labels, attributes):
+        # reach the max depth, force marking labels here
+        if currentNode.depth == self.max_depth:
+            currentNode.label = self.mostCommonLabel(labels)
+            return
 
         # All examples have the same label
         if self.checkLabel(labels):
@@ -60,7 +77,7 @@ class DecisionTree:
         currentNode.attribute = BestSplitAttribute
 
         for v in self.PossibleAttribute[BestSplitAttribute]:
-            newNode = Node(-1, "", v)
+            newNode = Node(-1, "", v,depth=currentNode.depth+1)
             currentNode.addNode(newNode)
 
             subAttributesData, subLabelsData = self.GetSubAttributeData(attributesData, labels, BestSplitAttribute, v)
@@ -95,16 +112,13 @@ class DecisionTree:
             result.append(TargetNode.label)
         return (np.count_nonzero(np.array(result)== LabelList))/len(LabelList)
 
-    def Predict(self, AttributeList, LabelList):
-
-        test = self.GetAccuracy(AttributeList, LabelList)
-        print("Decision tree accuracy percent for training data: ",self.predictRate*100,"%")
+    def Predict(self):
+        train = self.GetAccuracy(self.TrainAttributeData, self.TrainLabelData)
+        test = self.GetAccuracy(self.TestAttributeData, self.TestLabelData)
+        print("Decision tree accuracy percent for training data: ",train* 100,"%")
         print("Decision tree accuracy percent for testing data: ", test * 100, "%")
-    def RunTree(self, attributeData, labelData, numAttribute, split):
-        self.attribute_length = numAttribute
-        self.InitializePossibleAttribute(attributeData)
-        self.split = split
-
+    def RunTree(self):
+        self.InitializePossibleAttribute(self.TrainAttributeData)
         attributes = list(range(0, self.attribute_length))
-        self.ConstructTree(self.root, attributeData, labelData, attributes)
-        self.predictRate = self.GetAccuracy(attributeData, labelData)
+        self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes)
+        self.Predict()
