@@ -13,8 +13,12 @@ class DecisionTree:
     TrainLabelData= np.empty(1)
     TestAttributeData= np.empty(1)
     TestLabelData= np.empty(1)
+    numericalData = []
+    unknowAsAttribute = True # by default unknow will be treated as an attribute, if this is false, unknown will be the most common value of this attribute
 
-    def __init__(self,trainData,trainLabel,numAttribute,testData,testLabel,split=0,depth=100):
+    def __init__(self, trainData, trainLabel, numAttribute, testData, testLabel, split=0, depth=100, numeric=None,unknown = True):
+        if numeric is None:
+            numeric = []
         self.split = split
         self.max_depth = depth
         self.TrainAttributeData = trainData
@@ -23,9 +27,37 @@ class DecisionTree:
         self.TestAttributeData = testData
         self.TestLabelData = testLabel
         self.root = Node(-1, "", "",0)
+        self.numericalData = numeric
+        self.unknowAsAttribute = unknown
+
     def InitializePossibleAttribute(self, data):
         for i in range(self.attribute_length):
             self.PossibleAttribute[i] = []
+
+        # treat unknown attribute as the most common attribute
+        if not self.unknowAsAttribute:
+            for col in range(self.TrainAttributeData.shape[1]):
+                unique, pos = np.unique(self.TrainAttributeData[:, col], return_inverse=True)  # Finds all unique elements and their positions
+                counts = np.bincount(pos)  # Count the number of each unique element
+                maxpos = counts.argmax()
+
+                self.TrainAttributeData[:, col] = np.where(self.TrainAttributeData[:, col]=="unknown",maxpos,self.TrainAttributeData[:, col])
+
+                unique, pos = np.unique(self.TestAttributeData[:, col],
+                                        return_inverse=True)  # Finds all unique elements and their positions
+                counts = np.bincount(pos)  # Count the number of each unique element
+                maxpos = counts.argmax()
+                self.TestAttributeData[:, col] = np.where(self.TestAttributeData[:, col] == "unknown",maxpos,self.TrainAttributeData[:, col])
+        # reassign numerical values to discrete binary value
+        for i in self.numericalData:
+            numericalArray = np.array(self.TrainAttributeData[:,i], dtype=int)
+            median = np.median(numericalArray)
+            self.TrainAttributeData[:,i] = np.where(numericalArray>median,0,1)
+
+            numericalArray = np.array(self.TestAttributeData[:, i], dtype=int)
+            median = np.median(numericalArray)
+            self.TestAttributeData[:, i] = np.where(numericalArray >= median, 0, 1)
+
         for line in data:
             for i in range(self.attribute_length):
                 choices = self.PossibleAttribute[i]

@@ -14,14 +14,20 @@ def readFiles(CSVfile):
 
     return attributeData, labelData, attributeLength
 
-# TODO: numerial values
+
 
 def TestCar():
     TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("car/train.csv")
     TestAttributeData, TestLabelData, TestNumAttribute = readFiles("car/test.csv")
     for i in range(6):
         print("Max depth: ",i+1)
-        tree1 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=2,depth = i+1)
+        tree1 = DecisionTree(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),np.array(TestAttributeData), np.array(TestLabelData),split=2,depth = i+1)
         tree1.RunTree()
-
-
+def TestBank():
+    TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
+    TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
+    for i in range(6):
+        print("Max depth: ",i+1)
+        tree1 = DecisionTree(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),np.array(TestAttributeData), np.array(TestLabelData),split=2,depth=i+1,numeric=[0,5,9,11,12,13,14],unknown=False)
+        tree1.RunTree()
+TestBank()
