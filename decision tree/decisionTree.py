@@ -22,6 +22,7 @@ class DecisionTree:
         self.attribute_length = numAttribute
         self.TestAttributeData = testData
         self.TestLabelData = testLabel
+        self.root = Node(-1, "", "",0)
     def InitializePossibleAttribute(self, data):
         for i in range(self.attribute_length):
             self.PossibleAttribute[i] = []

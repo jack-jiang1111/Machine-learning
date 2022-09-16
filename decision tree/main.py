@@ -14,18 +14,14 @@ def readFiles(CSVfile):
 
     return attributeData, labelData, attributeLength
 
-# TODO: max depth tree
 # TODO: numerial values
-TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("car/train.csv")
-TestAttributeData, TestLabelData, TestNumAttribute = readFiles("car/test.csv")
 
-tree = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 1)
-tree.RunTree()
-
-tree1 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 2)
-tree1.RunTree()
-
-tree2 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=0,depth = 3)
-tree2.RunTree()
+def TestCar():
+    TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("car/train.csv")
+    TestAttributeData, TestLabelData, TestNumAttribute = readFiles("car/test.csv")
+    for i in range(6):
+        print("Max depth: ",i+1)
+        tree1 = DecisionTree(TrainAttributeData, TrainLabelData, TrainNumAttribute,TestAttributeData, TestLabelData,split=2,depth = i+1)
+        tree1.RunTree()
 
 

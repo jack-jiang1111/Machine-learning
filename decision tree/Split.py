@@ -1,3 +1,5 @@
+import sys
+
 import numpy as np
 
 
@@ -48,7 +50,7 @@ class Split:
         # for each attribute
         # for each value in attribute list, calculate gain
         # choose the largest gain attribute, return attribute index
-        maxGain = -1000
+        maxGain = -sys.maxsize - 1
         bestAttribute = 0
         index = 0
         for labelDistribution in self.labelDistribution:
@@ -63,7 +65,7 @@ class Split:
         return self.Attributes[bestAttribute]
 
     def SplitByME(self):
-        maxGain = -1000
+        maxGain = -sys.maxsize - 1
         bestAttribute = 0
         index = 0
         for labelDistribution in self.labelDistribution:
@@ -71,7 +73,7 @@ class Split:
             for key in labelDistribution:
                 value = labelDistribution[key]
                 if len(value) != 1:
-                    attribute_gain -= np.min(value) / 1000
+                    attribute_gain -= (np.sum(value)-np.max(value))/np.sum(value)
             if attribute_gain > maxGain:
                 maxGain = attribute_gain
                 bestAttribute = index
@@ -79,7 +81,7 @@ class Split:
         return self.Attributes[bestAttribute]
 
     def SplitByGini(self):
-        maxGain = -1000
+        maxGain = -sys.maxsize - 1
         bestAttribute = 0
         index = 0
         for labelDistribution in self.labelDistribution:
