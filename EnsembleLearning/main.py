@@ -1,0 +1,45 @@
+from Adaboost import *
+from Bagging import *
+
+# Take in file name return a dictionary
+def readFiles(CSVfile):
+    attributeData = []
+    labelData = []
+    attributeLength = 0
+    with open(CSVfile, 'r') as f:
+        for line in f:
+            terms = line.strip().split(',')
+            attributeData.append(terms[:-1])
+            labelData.append(terms[-1])
+            attributeLength = len(terms) - 1
+
+    return attributeData, labelData, attributeLength
+
+
+def TestaAdaboost(split):
+    TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
+    TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
+    tree1 = Adaboost(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
+                     np.array(TestAttributeData), np.array(TestLabelData), split=split,
+                     numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False,T=500)
+    tree1.runmain()
+
+
+
+def TestaBagging(split):
+    TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
+    TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
+    tree2 = Bagging(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
+                    np.array(TestAttributeData), np.array(TestLabelData), sampleSize=1000, split=split,
+                    numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=10)
+    tree2.runBagging()
+if __name__ == "__main__":
+    #TestaAdaboost(0)
+    TestaBagging(0)
+    print('\n')
+
+# ToDo:
+# 1. debug Adaboost
+# 2. fix Bagging fully expanding trees
+# 3. random forest
+# 4. All experiments
