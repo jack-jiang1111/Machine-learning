@@ -36,7 +36,7 @@ class Split:
 
         for i in self.Attributes:
             label_distribution = {}
-            for value in self.PossibleAttribute[i]:
+            for value in self.PossibleAttribute[i]:#self.Attributes.index(i)]:
                 mask = (dataArr[:, i] == value)
 
                 indexArray = np.where(dataArr[:, i] == value)

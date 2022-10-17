@@ -54,8 +54,7 @@ class DecisionTree:
 
             data[:, col] = np.where(data[:, col] == "unknown", maxpos, data[:, col])
     def InitializePossibleAttribute(self):
-        for i in range(self.randomForest):
-            self.PossibleAttribute[i] = []
+
 
         # treat unknown attribute as the most common attribute
         if not self.unknowAsAttribute:
@@ -80,14 +79,20 @@ class DecisionTree:
         if self.randomForest == self.attribute_length:
             AttributeList = MaxAttribute
         else:
-            AttributeList = random.sample(MaxAttribute, self.randomForest)
+            # random choose n attribute from [0,max attribute]
+            AttributeList = np.random.choice(MaxAttribute,self.randomForest,replace = False)
+
+        for i in AttributeList:
+            self.PossibleAttribute[i] = []
 
         for line in self.fullData:
-            for i in range(self.randomForest):  # random choose n attribute from [0,max attribute]
+            for i in self.PossibleAttribute.keys():
                 choices = self.PossibleAttribute[i]
-                if line[AttributeList[i]] not in choices:
-                    choices.append(line[AttributeList[i]])
+                if line[i] not in choices:
+                    choices.append(line[i])
                 self.PossibleAttribute[i] = choices
+
+        return AttributeList
 
     def checkLabel(self, labels):
         if len(labels) == 0:
@@ -128,6 +133,9 @@ class DecisionTree:
                 currentNode.label = self.mostCommonLabel(labels)
             else:
                 currentNode.label = labels[0]
+            return
+        elif len(attributes) == 0: # use all the attributes
+            currentNode.label = self.mostCommonLabel(labels)
             return
         split = Split(attributesData, labels, self.PossibleAttribute, attributes, self.weight, self.split,
                       self.randomForest)
@@ -181,17 +189,14 @@ class DecisionTree:
         print("Decision tree accuracy percent for testing data: ", test * 100, "%")
 
     def RunTree(self):
-        self.InitializePossibleAttribute()
-        attributes = list(range(0, self.attribute_length))
+        attributes = list(self.InitializePossibleAttribute())
         self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes)
         self.Predict()
 
     def RunTreeWithAdaboost(self):
-        self.InitializePossibleAttribute()
-        attributes = list(range(0, self.attribute_length))
+        attributes = list(self.InitializePossibleAttribute())
         self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes)
         predictTrain, hTrain = self.GetAccuracy(self.TrainAttributeData, self.TrainLabelData, rate=False)
         predictTest, hTest = self.GetAccuracy(self.TestAttributeData, self.TestLabelData, rate=False)
-        a, b = self.GetAccuracy(self.TestAttributeData, self.TestLabelData, rate=False)
 
         return predictTrain, hTrain, predictTest, hTest

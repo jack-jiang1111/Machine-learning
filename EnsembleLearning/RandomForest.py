@@ -15,12 +15,13 @@ class RandomForest:
     TestAttributeData = np.empty(1)
     TestLabelData = np.empty(1)
     numericalData = []
-    sampleSize = 4
+    AttributeSize = 4
     unknowAsAttribute = True  # by default unknow will be treated as an attribute, if this is false, unknown will be the most common value of this attribute
     T = 500  # numbers of iteration
+    sampleSize = 1000
 
-    def __init__(self, trainData, trainLabel, numAttribute, testData, testLabel, sampleSize=4, split=0, numeric=None,
-                 unknown=True, T=500):
+    def __init__(self, trainData, trainLabel, numAttribute, testData, testLabel, AttributeSize=4, split=0, numeric=None,
+                 unknown=True, T=500,sampleSize = 1000):
         if numeric is None:
             numeric = []
         self.split = split
@@ -32,17 +33,24 @@ class RandomForest:
         self.numericalData = numeric
         self.unknowAsAttribute = unknown
         self.T = T
+        self.AttributeSize = AttributeSize
         self.sampleSize = sampleSize
 
     def runRandomForest(self):
         FinalTesting = []
         for i in range(self.T):
+            sampleDataIndex = []
+            IndexRange = np.arange(0, len(self.TrainAttributeData) - 1, 1)
+            for j in range(self.sampleSize):
+                sampleDataIndex.append(random.choice(IndexRange))
+
             # create a sample of data
-            tree = Tree.DecisionTree(self.TrainAttributeData.copy(), self.TrainLabelData.copy(),
-                                     self.attribute_length.copy(),
+            trainDataSample = np.take(self.TrainAttributeData, sampleDataIndex, 0)
+            trainLabelSample = np.take(self.TrainLabelData, sampleDataIndex, 0)
+            tree = Tree.DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
                                      self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 15,
                                      self.numericalData.copy(), fullData=self.TrainAttributeData.copy(),
-                                     self.sampleSize)
+                                     randomForest=self.AttributeSize)
             predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
             FinalTesting.append(hTest)
             del tree
@@ -51,4 +59,4 @@ class RandomForest:
         finalArray = np.average(np.where(finalArray == "yes", 1, -1), 0)
         PredictResult = np.where(finalArray > 0, "yes", "no")
         accuracy = (np.count_nonzero(np.array(PredictResult) == self.TestLabelData)) / len(self.TestLabelData)
-        print("Accuracy for bagging: ", self.T, " iteration: ", accuracy)
+        print("Accuracy for random forest: ", self.T, " iteration: ", accuracy)

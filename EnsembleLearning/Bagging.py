@@ -45,7 +45,7 @@ class Bagging:
             trainDataSample = np.take(self.TrainAttributeData,sampleDataIndex,0)
             trainLabelSample = np.take(self.TrainLabelData,sampleDataIndex,0)
             tree = Tree.DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
-                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 15, self.numericalData.copy(),fullData=self.TrainAttributeData.copy())
+                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 100, self.numericalData.copy(),fullData=self.TrainAttributeData.copy())
             predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
             FinalTesting.append(hTest)
             del tree

@@ -1,5 +1,7 @@
 from Adaboost import *
 from Bagging import *
+from RandomForest import *
+
 
 # Take in file name return a dictionary
 def readFiles(CSVfile):
@@ -16,30 +18,41 @@ def readFiles(CSVfile):
     return attributeData, labelData, attributeLength
 
 
-def TestaAdaboost(split):
+def TestAdaboost():
     TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
     TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
     tree1 = Adaboost(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
-                     np.array(TestAttributeData), np.array(TestLabelData), split=split,
-                     numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False,T=500)
+                     np.array(TestAttributeData), np.array(TestLabelData), split=0,
+                     numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=500)
     tree1.runmain()
 
 
-
-def TestaBagging(split):
+def TestBagging():
     TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
     TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
     tree2 = Bagging(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
-                    np.array(TestAttributeData), np.array(TestLabelData), sampleSize=1000, split=split,
+                    np.array(TestAttributeData), np.array(TestLabelData), sampleSize=1000, split=0,
                     numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=10)
     tree2.runBagging()
+
+
+def TestRandomForest():
+    TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("bank/train.csv")
+    TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
+    tree = RandomForest(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
+                        np.array(TestAttributeData), np.array(TestLabelData), sampleSize=1000, split=0,
+                        numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=10, AttributeSize=2)
+    tree.runRandomForest()
+
+
 if __name__ == "__main__":
-    #TestaAdaboost(0)
-    TestaBagging(0)
+    # TestAdaboost()
+    TestBagging()
+    #TestRandomForest()
     print('\n')
 
 # ToDo:
 # 1. debug Adaboost
 # 2. fix Bagging fully expanding trees
-# 3. random forest
+# 3. random forest attribute list problem
 # 4. All experiments
