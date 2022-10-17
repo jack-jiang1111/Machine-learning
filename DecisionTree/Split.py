@@ -44,12 +44,10 @@ class Split:
                 lookUp, index = np.unique(rows,
                                           return_inverse=True)  # counts is a 1-d list return the counts of different labels
                 counts = np.bincount(index, weights=self.weights[indexArray])
-                counts = counts / np.sum(counts) * len(index)
 
-                sum_weight = np.sum(self.weights[indexArray])
                 # add weighted to the label_distribution counts
                 if len(counts) != 0:
-                    label_distribution[value] = (counts, sum_weight)
+                    label_distribution[value] = counts
             self.labelDistribution.append(label_distribution)
 
     def split(self):
@@ -68,12 +66,12 @@ class Split:
         maxGain = -sys.maxsize - 1
         bestAttribute = 0
         index = 0
+
         for labelDistribution in self.labelDistribution:
             attribute_gain = 0
             for key in labelDistribution:
-                value, weights = labelDistribution[key]
-                attribute_gain = attribute_gain + weights * (
-                    np.sum(value / np.sum(value) * np.log2(value / np.sum(value)))) * np.sum(value)
+                value = labelDistribution[key]
+                attribute_gain += np.sum(value * np.log2(value / np.sum(value)))
             if attribute_gain > maxGain:
                 maxGain = attribute_gain
                 bestAttribute = index

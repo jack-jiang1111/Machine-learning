@@ -41,7 +41,7 @@ def TestRandomForest():
     TestAttributeData, TestLabelData, TestNumAttribute = readFiles("bank/test.csv")
     tree = RandomForest(np.array(TrainAttributeData), np.array(TrainLabelData), np.array(TrainNumAttribute),
                         np.array(TestAttributeData), np.array(TestLabelData), sampleSize=1000, split=0,
-                        numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=10, AttributeSize=2)
+                        numeric=[0, 5, 9, 11, 12, 13, 14], unknown=False, T=500, AttributeSize=6)
     tree.runRandomForest()
 
 
