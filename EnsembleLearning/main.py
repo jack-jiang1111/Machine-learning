@@ -46,8 +46,8 @@ def TestRandomForest():
 
 
 if __name__ == "__main__":
-    # TestAdaboost()
-    TestBagging()
+    TestAdaboost()
+    #TestBagging()
     #TestRandomForest()
     print('\n')
 

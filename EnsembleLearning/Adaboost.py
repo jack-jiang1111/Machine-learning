@@ -54,21 +54,26 @@ class Adaboost:
         for i in range(self.T):
             tree = Tree.DecisionTree(self.TrainAttributeData.copy(), self.TrainLabelData.copy(), self.attribute_length.copy(),
                                      self.TestAttributeData.copy(), self.TestLabelData.copy(), weights, 0, 1, self.numericalData.copy())
-            predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
+            predictTrainBool, hTrain, predictTestBool, hTest = tree.RunTreeWithAdaboost()
 
+            # predict Train/Test Boolean, if predict correct, contain True, else contain False
+            # hTrain/Test, contains the predict values (as labels)
+            PredictWrongIndex = np.where(predictTrainBool==False)
 
-            PredictCorrectIndex = np.where(predictTrainBool==False)  # counts is a 1-d list return the counts of different labels
-            error = np.sum(weights[PredictCorrectIndex])
+            # Weighted error
+            error = np.sum(weights[PredictWrongIndex])
             alpha = 0.5 * np.log((1 - error) / error)
 
             # If predict correct, The boolean will be True and we will assign yi*ht(xi) to 1
             # else assign it to -1
             predictTrain = np.where(predictTrainBool == True, 1, -1)
 
+            #update weighted vector
             Dt = weights * np.exp(-alpha * predictTrain)
             Dt = Dt/np.sum(Dt)  # normalized
             weights = Dt
 
+            # Save a copy of final predict result
             hTrain = np.where(hTrain=='yes',1,-1)
             hTest = np.where(hTest=='yes',1,-1)
 
@@ -76,14 +81,14 @@ class Adaboost:
             hTestFinal += alpha * hTest
 
             trainAcc.append(np.count_nonzero(predictTrainBool)/len(self.TrainLabelData))
-            testAcc.append(np.count_nonzero(predictTest)/len(self.TestLabelData))
+            testAcc.append(np.count_nonzero(predictTestBool)/len(self.TestLabelData))
 
             FinalHypothesisTrain = np.where(hTrainFinal > 0, 'yes','no')
             FinalHypothesisTest = np.where(hTestFinal > 0, 'yes', 'no')
 
             trainAccAll.append((np.count_nonzero(np.array(FinalHypothesisTrain) == self.TrainLabelData)) / len(self.TrainLabelData))
             testAccAll.append((np.count_nonzero(np.array(FinalHypothesisTest) == self.TestLabelData)) / len(self.TestLabelData))
-            #print("trainAcc: ",trainAcc[i]," testAcc: ",testAcc[i]," trainAccAll: ",trainAccAll[i]," testAccAll: ",testAccAll[i])
-            if tree.root.attribute!=11:
-                print(tree.root.attribute)
+            print("trainAcc: ",trainAcc[i]," testAcc: ",testAcc[i]," trainAccAll: ",trainAccAll[i]," testAccAll: ",testAccAll[i])
+            #if tree.root.attribute!=11:
+            #    print(tree.root.attribute)
             del tree

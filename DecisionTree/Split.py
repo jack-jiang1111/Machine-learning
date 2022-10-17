@@ -14,9 +14,9 @@ class Split:
     # a list of dictionary, key is the values in attribute, value is count distribution
     labelDistribution = []
     weights = []
-    RandomForest = 0 # Random forest attributes
+    RandomForest = 0  # Random forest attributes
 
-    def __init__(self, data, labels, attributeValues, attributes, weights, choice=0,RandomForest=0):
+    def __init__(self, data, labels, attributeValues, attributes, weights, choice=0, RandomForest=0):
         self.choice = choice
         self.data = data
         self.labels = labels
@@ -36,7 +36,7 @@ class Split:
 
         for i in self.Attributes:
             label_distribution = {}
-            for value in self.PossibleAttribute[i]:#self.Attributes.index(i)]:
+            for value in self.PossibleAttribute[i]:  # self.Attributes.index(i)]:
                 mask = (dataArr[:, i] == value)
 
                 indexArray = np.where(dataArr[:, i] == value)
@@ -46,8 +46,10 @@ class Split:
                 counts = np.bincount(index, weights=self.weights[indexArray])
                 counts = counts / np.sum(counts) * len(index)
 
+                sum_weight = np.sum(self.weights[indexArray])
+                # add weighted to the label_distribution counts
                 if len(counts) != 0:
-                    label_distribution[value] = counts
+                    label_distribution[value] = (counts, sum_weight)
             self.labelDistribution.append(label_distribution)
 
     def split(self):
@@ -69,8 +71,9 @@ class Split:
         for labelDistribution in self.labelDistribution:
             attribute_gain = 0
             for key in labelDistribution:
-                value = labelDistribution[key]
-                attribute_gain += (np.sum(value / np.sum(value) * np.log2(value / np.sum(value)))) * np.sum(value)
+                value, weights = labelDistribution[key]
+                attribute_gain = attribute_gain + weights * (
+                    np.sum(value / np.sum(value) * np.log2(value / np.sum(value)))) * np.sum(value)
             if attribute_gain > maxGain:
                 maxGain = attribute_gain
                 bestAttribute = index
