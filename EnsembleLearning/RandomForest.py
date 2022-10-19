@@ -40,16 +40,14 @@ class RandomForest:
         FinalTesting = []
         FinalTraining = []
         for i in range(self.T):
-            sampleDataIndex = []
             IndexRange = np.arange(0, len(self.TrainAttributeData) - 1, 1)
-            for j in range(self.sampleSize):
-                sampleDataIndex.append(random.choice(IndexRange))
+            sampleDataIndex = np.random.choice(IndexRange,self.sampleSize,replace=True)
 
             # create a sample of data
             trainDataSample = np.take(self.TrainAttributeData, sampleDataIndex, 0)
             trainLabelSample = np.take(self.TrainLabelData, sampleDataIndex, 0)
             tree = Tree.DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
-                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 15,
+                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 1,
                                      self.numericalData.copy(), fullData=self.TrainAttributeData.copy(),
                                      randomForest=self.AttributeSize)
             predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
@@ -67,4 +65,6 @@ class RandomForest:
             PredictResult = np.where(finalTrainArray > 0, "yes", "no")
             TrainAccuracy = (np.count_nonzero(np.array(PredictResult) == trainLabelSample)) / len(trainLabelSample)
 
-            print("Accuracy for random forest: ", i, " iteration: ", TrainAccuracy,TestAccuracy)
+            TrainAccuracyIteration = np.count_nonzero(np.array(predictTrainBool)) / len(predictTrainBool)
+            TestAccuracyIteration = np.count_nonzero(np.array(predictTest)) / len(predictTest)
+            print("Accuracy for random forest: ", i, " iteration: ", 1-TrainAccuracy,1-TestAccuracy)

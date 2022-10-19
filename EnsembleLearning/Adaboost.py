@@ -42,12 +42,13 @@ class Adaboost:
         weights = (np.ones(len(self.TrainLabelData))).astype('double')
         weights = (weights / np.sum(weights))
 
+        TestWeight = (np.ones(len(self.TestLabelData))).astype('double')
+        TestWeight = (TestWeight / np.sum(TestWeight))
+
         hTrainFinal = np.zeros(len(self.TrainLabelData))
         hTestFinal = np.zeros(len(self.TestLabelData))
 
         # print info
-        trainAcc = []
-        testAcc = []
         trainAccAll = []
         testAccAll = []
 
@@ -59,10 +60,11 @@ class Adaboost:
             # predict Train/Test Boolean, if predict correct, contain True, else contain False
             # hTrain/Test, contains the predict values (as labels)
             PredictWrongIndex = np.where(predictTrainBool==False)
+            PredictWrongIndexTest = np.where(predictTestBool == False)
 
-            print(len(PredictWrongIndex[0])/5000)
             # Weighted error
             error = np.sum(weights[PredictWrongIndex[0]])
+            errorTest = np.sum(TestWeight[PredictWrongIndexTest[0]])
             alpha = 0.5 * np.log((1 - error) / error)
 
             # If predict correct, The boolean will be True and we will assign yi*ht(xi) to 1
@@ -81,15 +83,10 @@ class Adaboost:
             hTrainFinal += alpha * hTrain
             hTestFinal += alpha * hTest
 
-            trainAcc.append(np.count_nonzero(predictTrainBool)/len(self.TrainLabelData))
-            testAcc.append(np.count_nonzero(predictTestBool)/len(self.TestLabelData))
-
             FinalHypothesisTrain = np.where(hTrainFinal > 0, 'yes','no')
             FinalHypothesisTest = np.where(hTestFinal > 0, 'yes', 'no')
 
             trainAccAll.append((np.count_nonzero(np.array(FinalHypothesisTrain) == self.TrainLabelData)) / len(self.TrainLabelData))
             testAccAll.append((np.count_nonzero(np.array(FinalHypothesisTest) == self.TestLabelData)) / len(self.TestLabelData))
-            print("trainAcc: ",trainAcc[i]," testAcc: ",testAcc[i]," trainAccAll: ",trainAccAll[i]," testAccAll: ",testAccAll[i])
-            if tree.root.attribute!=-1:
-                print(tree.root.attribute)
+            print("trainAcc: ",error," testAcc: ",errorTest," trainAccAll: ",trainAccAll[i]," testAccAll: ",testAccAll[i])
             del tree

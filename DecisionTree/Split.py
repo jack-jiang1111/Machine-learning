@@ -108,3 +108,35 @@ class Split:
                 bestAttribute = index
             index += 1
         return self.Attributes[bestAttribute]
+
+    def SplitAdaBoost(self):
+        gain_x = 0
+        bestSplit = -1
+        for attribute in self.Attributes:
+            if len(self.data) == 0:
+                return 0
+
+            counts = dict()
+
+            for rowIndex in range(len(self.data)):
+                label = self.labels[rowIndex]
+                if label not in counts:
+                    counts[label] = 0.0
+                counts[label] += self.weights[rowIndex]
+
+            entropy = 0.0
+            total = np.sum(self.weights)
+            for (label, count) in counts.items():
+                p = count / total
+                entropy += -p * np.log2(p)
+
+            gain = 0
+            for value in self.PossibleAttribute[attribute]:
+                sub_set = np.where(self.data[attribute] == value)
+                sub_total = np.sum(self.weights[sub_set])
+                p = sub_total / total
+                gain += p * entropy
+                if entropy - gain > gain_x:
+                    gain_x = entropy - gain
+                    bestSplit = attribute
+        return bestSplit

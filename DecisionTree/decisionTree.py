@@ -103,39 +103,56 @@ class DecisionTree:
                 return False
         return True
 
-    def mostCommonLabel(self, labels):
-        occurence_count = Counter(labels)
-        return occurence_count.most_common(1)[0][0]
+    def mostCommonLabel(self, labels,dataIndex):
+        lookUp, index = np.unique(labels,
+                                  return_inverse=True)
+        lookUpResult = {}
+        for i in range(len(labels)):
+            if labels[i] not in lookUpResult:
+                lookUpResult[labels[i]] = 0
+            lookUpResult[labels[i]] += self.weight[dataIndex[i]]
+        maxLabel = "yes"
+        maxCount = 0
+        for keys in lookUpResult:
+            if lookUpResult[keys]>maxCount:
+                maxCount = lookUpResult[keys]
+                maxLabel = keys
+
+        return maxLabel
+        #occurence_count = Counter(labels)
+        #return occurence_count.most_common(1)[0][0]
 
     # return the attributes and label list, with the BestSplitAttribute index
-    def GetSubAttributeData(self, attributesData, labels, BestSplitAttribute, value):
+    def GetSubAttributeData(self, attributesData, labels, BestSplitAttribute, value,DataIndex):
         newAttributeData = []
         newLabelData = []
+        subDataIndex = []
         for A in range(len(attributesData)):
             if attributesData[A][BestSplitAttribute] == value:
                 newAttributeData.append(attributesData[A])
                 newLabelData.append(labels[A])
-        return newAttributeData, newLabelData
+                subDataIndex.append(DataIndex[A])
+        return newAttributeData, newLabelData,subDataIndex
 
     # currentNode: the Node current located
     # attributesData: List of list, training data
     # labels: list of labels corresponding to the attributeData
     # attributes: list of attribute still remaining
-    def ConstructTree(self, currentNode, attributesData, labels, attributes):
+    def ConstructTree(self, currentNode, attributesData, labels, attributes,dataIndex):
         # reach the max depth, force marking labels here
         if currentNode.depth == self.max_depth:
-            currentNode.label = self.mostCommonLabel(labels)
+            currentNode.label = self.mostCommonLabel(labels,dataIndex)
             return
 
         # All examples have the same label
         if self.checkLabel(labels):
             if len(attributes) == 0:
-                currentNode.label = self.mostCommonLabel(labels)
+                currentNode.label = self.mostCommonLabel(labels,dataIndex)
             else:
                 currentNode.label = labels[0]
             return
         elif len(attributes) == 0: # use all the attributes
-            currentNode.label = self.mostCommonLabel(labels)
+            currentNode.label = self.mostCommonLabel(labels,dataIndex)
             return
         split = Split(attributesData, labels, self.PossibleAttribute, attributes, self.weight, self.split,
                       self.randomForest)
@@ -146,13 +163,13 @@ class DecisionTree:
             newNode = Node(-1, "", v, depth=currentNode.depth + 1)
             currentNode.addNode(newNode)
 
-            subAttributesData, subLabelsData = self.GetSubAttributeData(attributesData, labels, BestSplitAttribute, v)
+            subAttributesData, subLabelsData,subDataIndex = self.GetSubAttributeData(attributesData, labels, BestSplitAttribute, v,dataIndex)
             if len(subAttributesData) == 0:
-                newNode.label = self.mostCommonLabel(labels)
+                newNode.label = self.mostCommonLabel(labels,dataIndex)
             else:
                 tempAttribute = attributes.copy()
                 tempAttribute.remove(BestSplitAttribute)
-                self.ConstructTree(newNode, subAttributesData, subLabelsData, tempAttribute)
+                self.ConstructTree(newNode, subAttributesData, subLabelsData, tempAttribute,subDataIndex)
 
         return
 
@@ -190,12 +207,14 @@ class DecisionTree:
 
     def RunTree(self):
         attributes = list(self.InitializePossibleAttribute())
-        self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes)
+        dataIndex = np.arange(0,len(self.TrainAttributeData),1)
+        self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes,dataIndex)
         self.Predict()
 
     def RunTreeWithAdaboost(self):
         attributes = list(self.InitializePossibleAttribute())
-        self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes)
+        dataIndex = np.arange(0, len(self.TrainAttributeData), 1)
+        self.ConstructTree(self.root, self.TrainAttributeData, self.TrainLabelData, attributes,dataIndex)
         predictTrain, hTrain = self.GetAccuracy(self.TrainAttributeData, self.TrainLabelData, rate=False)
         predictTest, hTest = self.GetAccuracy(self.TestAttributeData, self.TestLabelData, rate=False)
 
