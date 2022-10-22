@@ -10,7 +10,7 @@ class LinearRegression:
     learningRate = 0.01
     numAttribute = -1
 
-    def __init__(self,trainData,trainLabel,testData,testLabel,attributeLength,learningRate=0.01):
+    def __init__(self,trainData,trainLabel,testData,testLabel,attributeLength,learningRate=0.001):
         self.TestAttributeData = np.transpose(np.array(testData).astype(float))
         self.TrainAttributeData = np.transpose(np.array(trainData).astype(float))
         self.TrainLabelData = np.transpose(np.array(trainLabel).astype(float))
@@ -46,6 +46,10 @@ class LinearRegression:
                self.learningRate/=2
             if np.sqrt(np.sum(np.square(delta))) < tolerate:
                 break
+        PredictError = self.TestLabelData - np.matmul(weights, self.TestAttributeData)
+        print("Final weight: ", weights)
+        print("Final predict: ", np.matmul(weights, self.TestAttributeData))
+        print("Final error: ",0.5 * np.sum(np.square(PredictError)))
     def Batch(self):
         weights = np.transpose(np.zeros((self.numAttribute,1)).astype(float))
         tolerate = 1e-6
@@ -65,8 +69,13 @@ class LinearRegression:
             if it%5==0:
                self.learningRate/=2
         PredictError = self.TestLabelData - np.matmul(weights, self.TestAttributeData)
-        print(PredictError)
+        print("Final weight: ",weights)
+        print("Final predict: ",np.matmul(weights, self.TestAttributeData))
+        print("Final error: ",0.5 * np.sum(np.square(PredictError)))
     def Analysis(self):
-        weight = np.matmul(np.linalg.inv(np.matmul(self.TrainAttributeData,np.transpose(self.TrainAttributeData))),np.matmul(self.TrainAttributeData,self.TrainLabelData))
-        print(weight)
-        return weight
+        weights = np.matmul(np.linalg.inv(np.matmul(self.TrainAttributeData,np.transpose(self.TrainAttributeData))),np.matmul(self.TrainAttributeData,self.TrainLabelData))
+        PredictError = self.TestLabelData - np.matmul(weights, self.TestAttributeData)
+        print("Final weight: ", weights)
+        print("Final predict: ", np.matmul(weights, self.TestAttributeData))
+        print("Final error: ", 0.5 * np.sum(np.square(PredictError)))
+        return weights

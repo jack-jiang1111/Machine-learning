@@ -2,9 +2,8 @@ import os
 import random
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'DecisionTree'))
+from decisionTree import *
 
-import DecisionTree.decisionTree as Tree
 import numpy as np
 
 
@@ -46,8 +45,8 @@ class RandomForest:
             # create a sample of data
             trainDataSample = np.take(self.TrainAttributeData, sampleDataIndex, 0)
             trainLabelSample = np.take(self.TrainLabelData, sampleDataIndex, 0)
-            tree = Tree.DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
-                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 1,
+            tree = DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
+                                     self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 100,
                                      self.numericalData.copy(), fullData=self.TrainAttributeData.copy(),
                                      randomForest=self.AttributeSize)
             predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
@@ -55,16 +54,29 @@ class RandomForest:
             FinalTraining.append(hTrain)
             del tree
 
-            finalTestArray = np.array(FinalTesting)
-            finalTestArray = np.average(np.where(finalTestArray == "yes", 1, -1), 0)
-            PredictResult = np.where(finalTestArray > 0, "yes", "no")
-            TestAccuracy = (np.count_nonzero(np.array(PredictResult) == self.TestLabelData)) / len(self.TestLabelData)
+            if self.attribute_length == 19:
+                finalTestArray = np.array(FinalTesting)
+                finalTestArray = np.average(np.where(finalTestArray == "1", 1, -1), 0)
+                PredictResult = np.where(finalTestArray > 0, "1", "0")
+                TestAccuracy = (np.count_nonzero(np.array(PredictResult) == self.TestLabelData)) / len(self.TestLabelData)
 
-            finalTrainArray = np.array(FinalTraining)
-            finalTrainArray = np.average(np.where(finalTrainArray == "yes", 1, -1), 0)
-            PredictResult = np.where(finalTrainArray > 0, "yes", "no")
-            TrainAccuracy = (np.count_nonzero(np.array(PredictResult) == trainLabelSample)) / len(trainLabelSample)
+                finalTrainArray = np.array(FinalTraining)
+                finalTrainArray = np.average(np.where(finalTrainArray == "1", 1, -1), 0)
+                PredictResult = np.where(finalTrainArray > 0, "1", "0")
+                TrainAccuracy = (np.count_nonzero(np.array(PredictResult) == trainLabelSample)) / len(trainLabelSample)
+            else:
+                finalTestArray = np.array(FinalTesting)
+                finalTestArray = np.average(np.where(finalTestArray == "yes", 1, -1), 0)
+                PredictResult = np.where(finalTestArray > 0, "yes", "no")
+                TestAccuracy = (np.count_nonzero(np.array(PredictResult) == self.TestLabelData)) / len(
+                    self.TestLabelData)
+
+                finalTrainArray = np.array(FinalTraining)
+                finalTrainArray = np.average(np.where(finalTrainArray == "yes", 1, -1), 0)
+                PredictResult = np.where(finalTrainArray > 0, "yes", "no")
+                TrainAccuracy = (np.count_nonzero(np.array(PredictResult) == trainLabelSample)) / len(trainLabelSample)
 
             TrainAccuracyIteration = np.count_nonzero(np.array(predictTrainBool)) / len(predictTrainBool)
             TestAccuracyIteration = np.count_nonzero(np.array(predictTest)) / len(predictTest)
-            print("Accuracy for random forest: ", i, " iteration: ", 1-TrainAccuracy,1-TestAccuracy)
+            print("Accuracy for random forest: ", i, " iteration: ", TrainAccuracy,TestAccuracy)
+        return np.array(FinalTesting)

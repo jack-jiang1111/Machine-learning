@@ -3,11 +3,7 @@ import os
 import sys
 from collections import Counter
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'DecisionTree'))
-
-import DecisionTree.Node as Node
-import DecisionTree.Split as Split
-import DecisionTree.decisionTree as Tree
+from decisionTree import *
 import numpy as np
 
 
@@ -53,7 +49,7 @@ class Adaboost:
         testAccAll = []
 
         for i in range(self.T):
-            tree = Tree.DecisionTree(self.TrainAttributeData.copy(), self.TrainLabelData.copy(), self.attribute_length.copy(),
+            tree = DecisionTree(self.TrainAttributeData.copy(), self.TrainLabelData.copy(), self.attribute_length.copy(),
                                      self.TestAttributeData.copy(), self.TestLabelData.copy(), weights.copy(), 0, 1, self.numericalData.copy())
             predictTrainBool, hTrain, predictTestBool, hTest = tree.RunTreeWithAdaboost()
 
@@ -76,16 +72,29 @@ class Adaboost:
             Dt = Dt/np.sum(Dt)  # normalized
             weights = Dt
 
-            # Save a copy of final predict result
-            hTrain = np.where(hTrain=='yes',1,-1)
-            hTest = np.where(hTest=='yes',1,-1)
+            # credit card case
+            if self.attribute_length == 19:
+                # Save a copy of final predict result
+                hTrain = np.where(hTrain=='1',1,-1)
+                hTest = np.where(hTest=='1',1,-1)
+            else: #bank
+                hTrain = np.where(hTrain == 'yes', 1, -1)
+                hTest = np.where(hTest == 'yes', 1, -1)
 
             hTrainFinal += alpha * hTrain
             hTestFinal += alpha * hTest
 
-            FinalHypothesisTrain = np.where(hTrainFinal > 0, 'yes','no')
-            FinalHypothesisTest = np.where(hTestFinal > 0, 'yes', 'no')
 
+
+
+            # credit card case
+            if self.attribute_length == 19:
+                # Save a copy of final predict result
+                FinalHypothesisTrain = np.where(hTrainFinal > 0, '1', '0')
+                FinalHypothesisTest = np.where(hTestFinal > 0, '1', '0')
+            else:  # bank
+                FinalHypothesisTrain = np.where(hTrainFinal > 0, 'yes', 'no')
+                FinalHypothesisTest = np.where(hTestFinal > 0, 'yes', 'no')
             trainAccAll.append((np.count_nonzero(np.array(FinalHypothesisTrain) == self.TrainLabelData)) / len(self.TrainLabelData))
             testAccAll.append((np.count_nonzero(np.array(FinalHypothesisTest) == self.TestLabelData)) / len(self.TestLabelData))
             print("trainAcc: ",error," testAcc: ",errorTest," trainAccAll: ",trainAccAll[i]," testAccAll: ",testAccAll[i])

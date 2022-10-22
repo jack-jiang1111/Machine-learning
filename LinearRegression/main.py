@@ -18,12 +18,29 @@ def readFiles(CSVfile):
 if __name__ == "__main__":
     TrainAttributeData, TrainLabelData, TrainNumAttribute = readFiles("train.csv")
     TestAttributeData, TestLabelData, TestNumAttribute = readFiles("test.csv")
-    LinearRegressionModel = LinearRegression(TrainAttributeData, TrainLabelData,TestAttributeData, TestLabelData,TrainNumAttribute)
-    LinearRegressionModel.SGD()
+
+
+    while True:
+        run = input('Algorithm? 0 for Batch, 1 for SGD, 2 for Analysis\n')
+        while run != '0' and run != '1' and run != '2':
+            print("Sorry, unrecognized Algorithm\n")
+            run = input('Algorithm? 0 for Batch, 1 for SGD, 2 for Analysis\n')
+        if run == '0':
+            LinearRegressionModel = LinearRegression(TrainAttributeData, TrainLabelData, TestAttributeData,
+                                                     TestLabelData, TrainNumAttribute)
+            LinearRegressionModel.Batch()
+        elif run == '1':
+            LinearRegressionModel = LinearRegression(TrainAttributeData, TrainLabelData, TestAttributeData,
+                                                     TestLabelData, TrainNumAttribute)
+            LinearRegressionModel.SGD()
+        else:
+            LinearRegressionModel = LinearRegression(TrainAttributeData, TrainLabelData, TestAttributeData,
+                                                     TestLabelData, TrainNumAttribute)
+            LinearRegressionModel.Analysis()
+
+    #LinearRegressionModel.SGD()
     #LinearRegressionModel.Batch()
     #LinearRegressionModel.Analysis()
-
-    print('\n')
 
 # ToDo:
 # 1. debug Adaboost

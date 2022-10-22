@@ -2,9 +2,7 @@ import os
 import random
 import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'DecisionTree'))
-
-import DecisionTree.decisionTree as Tree
+from decisionTree import *
 import numpy as np
 
 
@@ -47,7 +45,7 @@ class Bagging:
             # create a sample of data
             trainDataSample = np.take(self.TrainAttributeData, sampleDataIndex, 0)
             trainLabelSample = np.take(self.TrainLabelData, sampleDataIndex, 0)
-            tree = Tree.DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
+            tree = DecisionTree(trainDataSample, trainLabelSample, self.attribute_length.copy(),
                                      self.TestAttributeData.copy(), self.TestLabelData.copy(), None, 0, 100,
                                      self.numericalData.copy(), fullData=self.TrainAttributeData.copy())
             predictTrainBool, hTrain, predictTest, hTest = tree.RunTreeWithAdaboost()
@@ -58,11 +56,18 @@ class Bagging:
             finalTestArray = np.array(FinalTesting)
             finalTrainArray = np.array(FinalTrain)
 
-            finalTestArray = np.average(np.where(finalTestArray == "yes", 1, -1), 0)
-            finalTrainArray = np.average(np.where(finalTrainArray == "yes", 1, -1), 0)
+            if self.attribute_length == 19:
+                finalTestArray = np.average(np.where(finalTestArray == "1", 1, -1), 0)
+                finalTrainArray = np.average(np.where(finalTrainArray == "1", 1, -1), 0)
 
-            PredictTestResult = np.where(finalTestArray > 0, "yes", "no")
-            PredictTrainResult = np.where(finalTrainArray > 0, "yes", "no")
+                PredictTestResult = np.where(finalTestArray > 0, "1", "0")
+                PredictTrainResult = np.where(finalTrainArray > 0, "1", "0")
+            else:
+                finalTestArray = np.average(np.where(finalTestArray == "yes", 1, -1), 0)
+                finalTrainArray = np.average(np.where(finalTrainArray == "yes", 1, -1), 0)
+
+                PredictTestResult = np.where(finalTestArray > 0, "yes", "no")
+                PredictTrainResult = np.where(finalTrainArray > 0, "yes", "no")
 
             Testaccuracy = (np.count_nonzero(np.array(PredictTestResult) == self.TestLabelData)) / len(self.TestLabelData)
             Trainaccuracy = (np.count_nonzero(np.array(PredictTrainResult) == trainLabelSample)) / len(
