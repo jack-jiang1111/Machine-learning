@@ -46,7 +46,7 @@ class Perceptron:
                     self.w += self.r * self.TrainData[index][:-1] * self.TrainData[index][-1]
             trainError = self.TestError(self.TrainData)
             testError = self.TestError(self.TestData)
-            print("Epoch ", i, " w: ", np.round(self.w,3), " Train Error: ", np.round(trainError,3), " Test Error: ", np.round(testError,3))
+            print("Epoch ", i, " w: ", np.round(self.w,3), " Train Error: ", np.round(1-trainError,3), " Test Error: ", np.round(1-testError,3))
 
     def TestErrorVote(self, W, C, data):
         finalResult = np.zeros(len(data))
@@ -65,6 +65,7 @@ class Perceptron:
         C = []
         W = []
         for i in range(self.maxEpoch):
+            #np.random.shuffle(self.TrainData)
             for index in range(len(self.TrainData)):
                 error = (np.dot(self.w, self.TrainData[index][:-1]) + self.b) * self.TrainData[index][-1]
                 if error <= 0:
@@ -77,7 +78,7 @@ class Perceptron:
                     C[m - 1] += 1
             trainError = self.TestErrorVote(W, C, self.TrainData)
             testError = self.TestErrorVote(W, C, self.TestData)
-            print("Epoch ", i, " w: ", np.round(self.w,3), " Train Error: ", np.round(trainError,3), " Test Error: ", np.round(testError,3))
+            print("Epoch ", i, " w: ", np.round(self.w,3), " Train Error: ", np.round(1-trainError,3), " Test Error: ", np.round(1-testError,3))
 
     def TestErrorAverage(self, a, data):
         x = np.array(data[:, 0:-1])
@@ -98,4 +99,4 @@ class Perceptron:
                     a += self.w
             trainError = self.TestErrorAverage(a, self.TrainData)
             testError = self.TestErrorAverage(a, self.TestData)
-            print("Epoch ", i, " w: ", np.round(a,3), " Train Error: ", np.round(trainError,3), " Test Error: ", np.round(testError,3))
+            print("Epoch ", i, " w: ", np.round(a,3), " Train Error: ", np.round(1-trainError,3), " Test Error: ", np.round(1-testError,3))
