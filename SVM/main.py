@@ -1,4 +1,5 @@
 from SVM import *
+from Dual import *
 # Take in file name return a dictionary
 def readFiles(CSVfile):
     attributeData = []
@@ -15,19 +16,21 @@ def readFiles(CSVfile):
 if __name__ == "__main__":
     TrainAttributeData, TrainNumAttribute = readFiles("train.csv")
     TestAttributeData, TestNumAttribute = readFiles("test.csv")
-
     while 1:
         run = input(
-            'Algorithm? 0 for Standard, 1 for Voted, 2 for Average\n')
-        while run != '0' and run != '1' and run != '2':
+            'Algorithm? 0 for Primal SVM, 1 for Dual SVM, 2 for Gaussian Kernel\n')
+        while run != '0' and run != '1' and run!='2':
             print("Sorry, unrecognized Algorithm\n")
-            run = input('Algorithm? 0 for Standard, 1 for Voted, 2 for Average\n')
-        perceptronModel = Perceptron(TrainAttributeData, TestAttributeData, TrainNumAttribute)
+            run = input('Algorithm? 0 for Primal SVM, 1 for Dual SVM, 2 for Gaussian Kernel\n')
         if run == '0':
-            perceptronModel.runStandard()
+            primalSvm = svm(TrainAttributeData, TestAttributeData, TrainNumAttribute)
+            primalSvm.runPrimal()
         elif run == '1':
-            perceptronModel.runVoted()
+            dualSvm = dualSVM(TrainAttributeData, TestAttributeData, TrainNumAttribute)
+            dualSvm.runDual()
         else:
-            perceptronModel.runAverage()
+            dualSvm = dualSVM(TrainAttributeData, TestAttributeData, TrainNumAttribute)
+            dualSvm.runDualGaussianKernel()
+
 
 # ToDo:
