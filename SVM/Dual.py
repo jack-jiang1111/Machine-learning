@@ -83,7 +83,7 @@ class dualSVM:
         return Acc / rows
 
     def runDualGaussianKernel(self):
-        C = [100 / 873, 500 / 873, 700 / 873]
+        C = [500 / 873]
         Gamma = [0.1, 0.5, 1, 5, 100]
         rows = self.TrainData.shape[0]
 
@@ -123,8 +123,8 @@ class dualSVM:
                 testError = self.kernelTestError(self.TestData, self.TestData.shape[0], Opresult.x, self.b, g)
                 supportVector = np.sum(Opresult.x != 0.0)
                 print("Gamma: ", g, " C: ", c, " w: ", np.round(self.w, 3), " Train Error: ",
-                      np.round(1 - trainError, 3), " Test Error: ",
-                      np.round(1 - testError, 3), " support Vector: ", supportVector)
+                      np.round(1 - trainError, 5), " Test Error: ",
+                      np.round(1 - testError, 5), " support Vector: ", supportVector)
                 if c == 500 / 873:
                     intersect = len(np.intersect1d(sup_vec, np.argwhere(Opresult.x > 0)))
                     print("g:", g, " intersect: ", intersect)
