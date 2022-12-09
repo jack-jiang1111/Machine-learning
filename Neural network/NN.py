@@ -29,7 +29,7 @@ class NN:
     TestLabel = np.empty(1)
     numAttribute = -1
     lr = 0.01
-    maxEpoch = 5
+    maxEpoch = 50
 
     def __init__(self, trainData, testData, numAttr):
         self.TrainData = np.array(trainData[:, :-1], dtype='float64').T
